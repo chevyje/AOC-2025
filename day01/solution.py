@@ -2,6 +2,7 @@ import os
 
 start_dial: int = 50
 zero_count: int = 0
+previous_dial: int = start_dial
 current_dial: int = start_dial
 
 base = os.path.dirname(__file__)
@@ -25,7 +26,8 @@ def start():
 def turn(amount: int, rotation: str) -> None:
     global current_dial
     global zero_count
-    print(str(current_dial) + ", " + str(amount) + ", " + str(rotation))
+    global previous_dial
+    amount = check_rounds(amount)
 
     if rotation == 'R':
         current_dial += amount
@@ -38,20 +40,31 @@ def turn(amount: int, rotation: str) -> None:
     back_to_dial()
     if current_dial == 0:
         zero_count += 1
-        print(current_dial, zero_count)
-    print(current_dial)
+    previous_dial = current_dial
 
 def back_to_dial():
     global current_dial
+    global zero_count
+    global previous_dial
 
     if current_dial > 99:
         current_dial -= 100
+        if current_dial != 0 and previous_dial != 0:
+            zero_count += 1
         back_to_dial()
     elif current_dial < 0:
         current_dial += 100
+        if current_dial != 0 and previous_dial != 0:
+            zero_count += 1
         back_to_dial()
     else:
         return
 
+def check_rounds(amount: int) -> int:
+    global zero_count
+    rounds = amount // 100
+    zero_count += rounds
+    amount -= rounds * 100
+    return amount
 # Run the code
 start()
