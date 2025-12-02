@@ -1,6 +1,6 @@
 import os
 
-answer: int = 0
+answer: set[int] = set()
 
 base = os.path.dirname(__file__)
 path = os.path.join(base, "input.txt")
@@ -9,9 +9,8 @@ def start():
     global answer
     with open(path) as file:
         line = file.readline()
-        x = line.split(",")
+        x: list[str] = line.split(",")
         for item in x:
-            print(item)
             if item == "": continue
             try:
                 values = item.split("-")
@@ -19,26 +18,36 @@ def start():
                 end: int = int(values[1])
                 for i in range(begin, end+1):
                     odd_or_even(str(i))
-                print(f"begin: {begin} ({len(str(begin))}), end: {end} ({len(str(end))})")
             except ValueError:
                 print(f"ValueError: {item}")
-        print(answer)
+        total_answer()
 
 def odd_or_even(value: str):
     length: int = len(value)
-    if length % 2 == 0:
-        repeated(value, length)
+    for x in range(1, 10):
+        if length % x == 0:
+            repeated(value, length, x)
     return
 
-def repeated(value: str, length: int):
+def repeated(value: str, length: int, divided: int):
     global answer
     try:
-        half: int = int(length/2)
-        half_1: int = int(value[:half])
-        half_2: int = int(value[half:])
-        if half_1 == half_2:
-            answer += int(value)
+        parts: set[int] = set()
+        for i in range(0, length, divided):
+            parts.add(int(value[i:i + divided]))
+
+        if len(parts) == 1 and int(value) not in parts:
+            print(f"added answer: {value}")
+            answer.add(int(value))
     except ValueError:
         print(f"ValueError: {value}")
+
+def total_answer():
+    global answer
+    total: int = 0
+    for item in answer:
+        total += item
+
+    print(total)
 
 start()
